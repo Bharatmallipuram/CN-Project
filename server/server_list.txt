@@ -1,0 +1,9 @@
+ftp_files
+ftp_server
+ftp_server.c
+sample.txt
+server.crt
+server.key
+server.log
+server_list.txt
+tmp_list.txt

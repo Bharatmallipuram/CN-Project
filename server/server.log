@@ -1,0 +1,12 @@
+[Wed Nov  6 18:26:02 2024] Server started and listening for connections...
+[Wed Nov  6 18:26:09 2024] Client connected with SSL/TLS encryption.
+[Wed Nov  6 18:26:09 2024] LIST command executed.
+[Wed Nov  6 18:26:09 2024] Requested file: sample.txt
+[Wed Nov  6 18:26:09 2024] File sent successfully.
+[Wed Nov  6 18:26:09 2024] Client disconnected.
+[Wed Nov  6 18:30:35 2024] Server started and listening for connections...
+[Wed Nov  6 18:31:25 2024] Server started and listening for connections...
+[Wed Nov  6 18:31:28 2024] Client connected with SSL/TLS encryption.
+[Wed Nov  6 18:31:32 2024] LIST command executed.
+[Wed Nov  6 18:31:44 2024] Requested file: <sample.txt>
+[Wed Nov  6 18:33:25 2024] Client disconnected.
