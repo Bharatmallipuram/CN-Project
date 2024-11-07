@@ -1,4 +1,5 @@
-//gcc ftp_server.c -o ftp_server -lssl -lcrypto
+// Compile with: gcc ftp_server.c -o ftp_server -lssl -lcrypto
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,7 +63,6 @@ void handle_client(SSL *ssl)
 
         if (strncmp(buffer, "LIST", 4) == 0)
         {
-            // Send directory listing
             FILE *list_file = popen("ls", "r");
             if (list_file == NULL)
             {
@@ -71,13 +71,12 @@ void handle_client(SSL *ssl)
                 return;
             }
 
-            // Read each line and send to the client
             while (fgets(buffer, sizeof(buffer), list_file) != NULL)
             {
                 SSL_write(ssl, buffer, strlen(buffer));
             }
             pclose(list_file);
-            SSL_write(ssl, "END", strlen("END")); // Send "END" to indicate completion
+            SSL_write(ssl, "END", strlen("END"));
         }
         else if (strncmp(buffer, "RETR ", 5) == 0)
         {
@@ -87,7 +86,8 @@ void handle_client(SSL *ssl)
             if (file == NULL)
             {
                 perror("File open error");
-                break;
+                SSL_write(ssl, "ERROR", strlen("ERROR"));
+                continue;
             }
             printf("Sending %s to client...\n", filename);
             while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
@@ -105,7 +105,8 @@ void handle_client(SSL *ssl)
             if (file == NULL)
             {
                 perror("File open error");
-                break;
+                SSL_write(ssl, "ERROR", strlen("ERROR"));
+                continue;
             }
             printf("Receiving %s from client...\n", filename);
             while ((bytes = SSL_read(ssl, buffer, sizeof(buffer))) > 0)

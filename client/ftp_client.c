@@ -1,4 +1,4 @@
-// gcc ftp_client.c -o ftp_client -lssl -lcrypto
+// Compile with: gcc ftp_client.c -o ftp_client -lssl -lcrypto
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,7 +70,7 @@ void handle_commands(SSL *ssl)
                 buffer[bytes] = '\0';
                 if (strncmp(buffer, "END", 3) == 0)
                     break;
-                printf("%s", buffer); // Print each line received
+                printf("%s", buffer);
             }
         }
         else if (choice == 2)
@@ -79,8 +79,6 @@ void handle_commands(SSL *ssl)
             fgets(command, sizeof(command), stdin);
             command[strcspn(command, "\n")] = '\0';
 
-            // Ensure the RETR command doesn't overflow buffer
-            // snprintf(buffer, BUFFER_SIZE - 5, "RETR %s", command);
             snprintf(buffer, BUFFER_SIZE - 5, "RETR %s", strncpy(temp, command, BUFFER_SIZE - 10));
             SSL_write(ssl, buffer, strlen(buffer));
 
@@ -106,8 +104,6 @@ void handle_commands(SSL *ssl)
             fgets(command, sizeof(command), stdin);
             command[strcspn(command, "\n")] = '\0';
 
-            // Ensure the STOR command doesn't overflow buffer
-            // snprintf(buffer, BUFFER_SIZE - 5, "STOR %s", command);
             snprintf(buffer, BUFFER_SIZE - 5, "STOR %s", strncpy(temp, command, BUFFER_SIZE - 10));
             SSL_write(ssl, buffer, strlen(buffer));
 
@@ -145,7 +141,6 @@ int main()
     int sock;
     struct sockaddr_in server_addr;
     SSL_CTX *ctx;
-    SSL *ssl;
 
     initialize_openssl();
     ctx = create_context();
@@ -159,33 +154,31 @@ int main()
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_addr.sin_addr.s_addr = INADDR_ANY;
 
     if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
-        perror("Unable to connect to server");
+        perror("Unable to connect");
         exit(EXIT_FAILURE);
     }
 
-    ssl = SSL_new(ctx);
+    SSL *ssl = SSL_new(ctx);
     SSL_set_fd(ssl, sock);
 
     if (SSL_connect(ssl) <= 0)
     {
         ERR_print_errors_fp(stderr);
-        exit(EXIT_FAILURE);
     }
-
-    printf("Connected to server with SSL/TLS encryption.\n");
-
-    handle_commands(ssl);
+    else
+    {
+        printf("Connected to server with SSL/TLS encryption.\n");
+        handle_commands(ssl);
+    }
 
     SSL_shutdown(ssl);
     SSL_free(ssl);
     close(sock);
-
     SSL_CTX_free(ctx);
     cleanup_openssl();
-
     return 0;
 }
