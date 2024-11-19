@@ -59,7 +59,7 @@ void handle_commands(SSL *ssl)
         scanf("%d", &choice);
         getchar();
 
-        if (choice == 1)
+        if (choice == 1)  // LIST
         {
             strcpy(command, "LIST");
             SSL_write(ssl, command, strlen(command));
@@ -73,7 +73,7 @@ void handle_commands(SSL *ssl)
                 printf("%s", buffer);
             }
         }
-        else if (choice == 2)
+        else if (choice == 2)  // RETR (Download)
         {
             printf("Enter filename to download: ");
             fgets(command, sizeof(command), stdin);
@@ -93,12 +93,12 @@ void handle_commands(SSL *ssl)
             {
                 if (strncmp(buffer, "END", 3) == 0)
                     break;
-                fwrite(buffer, 1, bytes, file);
+                fwrite(buffer, 1, bytes, file);  // Write to local file
             }
             fclose(file);
             printf("File downloaded as '%s'.\n", command);
         }
-        else if (choice == 3)
+        else if (choice == 3)  // STOR (Upload)
         {
             printf("Enter filename to upload: ");
             fgets(command, sizeof(command), stdin);
@@ -116,13 +116,13 @@ void handle_commands(SSL *ssl)
 
             while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
             {
-                SSL_write(ssl, buffer, bytes);
+                SSL_write(ssl, buffer, bytes);  // Send chunks to server
             }
+            SSL_write(ssl, "END", 3);  // End of transfer
             fclose(file);
-            SSL_write(ssl, "END", 3);
             printf("File uploaded successfully.\n");
         }
-        else if (choice == 4)
+        else if (choice == 4)  // QUIT
         {
             strcpy(command, "QUIT");
             SSL_write(ssl, command, strlen(command));
@@ -135,6 +135,7 @@ void handle_commands(SSL *ssl)
         }
     }
 }
+
 
 int main()
 {

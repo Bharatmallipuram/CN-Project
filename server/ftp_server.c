@@ -92,10 +92,10 @@ void handle_client(SSL *ssl)
             printf("Sending %s to client...\n", filename);
             while ((bytes = fread(buffer, 1, sizeof(buffer), file)) > 0)
             {
-                SSL_write(ssl, buffer, bytes);
+                SSL_write(ssl, buffer, bytes);  // Send data in chunks
             }
             fclose(file);
-            SSL_write(ssl, "END", 3);
+            SSL_write(ssl, "END", 3);  // End of file transfer
         }
         else if (strncmp(buffer, "STOR ", 5) == 0)
         {
@@ -112,8 +112,8 @@ void handle_client(SSL *ssl)
             while ((bytes = SSL_read(ssl, buffer, sizeof(buffer))) > 0)
             {
                 if (strncmp(buffer, "END", 3) == 0)
-                    break;
-                fwrite(buffer, 1, bytes, file);
+                    break;  // End of file transfer
+                fwrite(buffer, 1, bytes, file);  // Write to file
             }
             fclose(file);
             printf("File %s stored successfully.\n", filename);
